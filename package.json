@@ -6,7 +6,12 @@
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
-    "elysia": "latest"
+    "@elysiajs/bearer": "^0.6.0",
+    "@types/nodemailer": "^6.4.10",
+    "elysia": "latest",
+    "knex": "^2.5.1",
+    "nodemailer": "^6.9.5",
+    "pg": "^8.11.3"
   },
   "devDependencies": {
     "bun-types": "latest"

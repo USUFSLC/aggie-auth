@@ -1,15 +1,11 @@
-# Elysia with Bun runtime
+# Aggie Auth
 
-## Getting Started
-To get started with this template, simply paste this command into your terminal:
-```bash
-bun create elysia ./elysia-example
-```
+Aggie auth is an "internal" api for USUFSLC services to authenticate students (or anyone
+with an a-number).
 
-## Development
-To start the development server run:
-```bash
-bun run dev
-```
+## How do I use it?
 
-Open http://localhost:3000/ with your browser to see the result.
+As [elysia](https://elysiajs.com/) generates OpenAPI specs, you can generate clients in most 
+languages!
+
+For an example without OpenAPI though, see [example.ts](https://github.com/USUFSLC/aggie-auth/blob/main/example/example.ts).

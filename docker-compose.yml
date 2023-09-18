@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  server:
+    depends_on:
+      - db
+    build:
+      dockerfile: Dockerfile.server
+    env_file:
+      - .env
+    networks:
+      - webapp
+    restart: always
+    container_name: aggieauth-server
+    ports:
+      - 17566:8000
+
+  db:
+    restart: "always"
+    image: "postgres:15"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - webapp
+    env_file:
+      - .env
+    container_name: aggieauth-db
+
+volumes:
+  pgdata:
+
+networks:
+  webapp:
+    driver: bridge

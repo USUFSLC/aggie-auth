@@ -1,0 +1,9 @@
+FROM oven/bun
+
+COPY . /app
+
+WORKDIR /app/server
+
+RUN bun install
+
+CMD bun run /app/src/db/update.ts && bun run /app/src/index.ts
