@@ -1,6 +1,6 @@
 export type RetryStrategyF = (retries: number) => number;
 
-export const MAX_DEFAULT_RETRY_AMOUNT = 3;
+export const MAX_DEFAULT_RETRY_AMOUNT = 5;
 export const WAIT_MS = 1_000;
 export const RETRY_EXPONENT = 2;
 export const RETRY_EXPONENTIAL_FACTOR = 1.1;

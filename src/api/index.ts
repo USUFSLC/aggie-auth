@@ -30,6 +30,8 @@ export class AggieAuthService extends Elysia {
 
     this.use(bearer());
 
+    this.get("/health", () => "ok");
+
     this.get(
       "/authaggie",
       async ({ query, set }) => {
