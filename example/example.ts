@@ -1,10 +1,10 @@
-// after running "bun run src/index.ts..." (or using prod... nobody will stop you :)
+// after running "bun run src/index.ts..."
 
 import { ApiToken } from "../src/db/model";
 import { logOverPromise } from "../src/utils";
 
 const TEST_PORT = 4200;
-//const AGGIE_AUTH_HOST = "https://aggie-auth.linux.usu.edu";
+//const AGGIE_AUTH_HOST = "https://aggie-auth.linux.usu.edu"; for testing w/ prod :)
 const AGGIE_AUTH_HOST = "http://localhost:8000";
 let ANUMBER = "a01234567";
 process.stdout.write("what is your anumber? > ");

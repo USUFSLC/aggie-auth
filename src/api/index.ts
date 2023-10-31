@@ -1,4 +1,5 @@
 import Elysia, { NotFoundError, t } from "elysia";
+import { swagger } from "@elysiajs/swagger";
 import { bearer } from "@elysiajs/bearer";
 import { AggieToken, AggieTokenDAO, ApiToken, ApiTokenDAO } from "../db/model";
 import { Mailer } from "../utils";
@@ -23,11 +24,13 @@ export class AggieAuthService extends Elysia {
     aggieMailer: Mailer
   ) {
     super();
+
     this.apiHost = apiHost;
     this.apiTokenDAO = apiTokenDAO;
     this.aggieTokenDAO = aggieTokenDAO;
     this.aggieMailer = aggieMailer;
 
+    this.use(swagger()); // openapi spec at /swagger/json!
     this.use(bearer());
 
     this.get("/health", () => "ok");
