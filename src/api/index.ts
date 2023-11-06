@@ -30,7 +30,18 @@ export class AggieAuthService extends Elysia {
     this.aggieTokenDAO = aggieTokenDAO;
     this.aggieMailer = aggieMailer;
 
-    this.use(swagger()); // openapi spec at /swagger/json!
+    this.use(
+      swagger({
+        documentation: {
+          info: {
+            title: "AggieAuthAPI",
+            version: "0.0.1",
+          },
+          servers: [{ url: this.apiHost }],
+        },
+      }),
+    ); // openapi spec at /swagger/json!
+
     this.use(bearer());
 
     this.get("/health", () => "ok");
