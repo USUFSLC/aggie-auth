@@ -308,9 +308,9 @@ export class AggieAuthService extends Elysia {
       `<p>🔒 A login token has been requested for <strong>${anumber}</strong>, for a service that describes itself as:</p>` +
       `<ul><li><code>{"description": "${description}"}</code></li></ul>\n` +
       `<p>🚫 <strong>If you did not request this, please ignore this email.</strong></p>\n` +
-      `<p>✅ Else, here's that link: <a href="${verificationLink}">${verificationLink}</a>.</p>\n` +
+      `<p>✅ Else, here's that link: <a rel="nofollow" href="${verificationLink}">${verificationLink}</a>.</p>\n` +
       `<code>==================</code>` +
-      `<p>🐙 <a href="https://github.com/usufslc/aggie-auth">aggie-auth</a>, a project from the <a href="https://linux.usu.edu">USU Free Software and Linux Club</a></p>`
+      `<p>🐙 <a rel="nofollow" href="https://github.com/usufslc/aggie-auth">aggie-auth</a>, a project from the <a href="https://linux.usu.edu">USU Free Software and Linux Club</a></p>`
     );
   }
 }
