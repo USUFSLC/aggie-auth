@@ -1,4 +1,4 @@
-import Elysia, { NotFoundError, t } from "elysia";
+import Elysia, { InternalServerError, NotFoundError, t } from "elysia";
 import { swagger } from "@elysiajs/swagger";
 import { bearer } from "@elysiajs/bearer";
 import { AggieToken, AggieTokenDAO, ApiToken, ApiTokenDAO } from "../db/model";
@@ -7,7 +7,7 @@ import { Mailer } from "../utils";
 export class AggieAuthService extends Elysia {
   static A_NUMBER_REGEX = new RegExp(/^a[0-9]{8}$/i);
   static UUID_V4_REGEX = new RegExp(
-    /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i,
+    /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
   );
   static DEFAULT_CALLBACK = "http://localhost:3000/api/aggie_auth";
 
@@ -21,7 +21,7 @@ export class AggieAuthService extends Elysia {
     port: number,
     apiTokenDAO: ApiTokenDAO,
     aggieTokenDAO: AggieTokenDAO,
-    aggieMailer: Mailer,
+    aggieMailer: Mailer
   ) {
     super();
 
@@ -39,7 +39,7 @@ export class AggieAuthService extends Elysia {
           },
           servers: [{ url: this.apiHost }],
         },
-      }),
+      })
     ); // openapi spec at /swagger/json!
 
     this.use(bearer());
@@ -50,6 +50,11 @@ export class AggieAuthService extends Elysia {
       "/authaggie",
       async ({ query, set }) => {
         const token = query.aggieToken.toLowerCase();
+        if (!token.match(AggieAuthService.UUID_V4_REGEX)) {
+          set.status = 403;
+          throw new Error("token must be a uuid4");
+        }
+
         const aggieToken = await this.aggieTokenDAO.find(token);
         if (!aggieToken) throw new NotFoundError();
 
@@ -67,28 +72,32 @@ export class AggieAuthService extends Elysia {
           return;
         }
 
-        const redirectWithButtonClicked = new URLSearchParams({
-          ...query,
-          buttonClicked: "true",
-        });
-
         set.headers["Content-Type"] = "text/html";
-        return `<body><a href="/authaggie?${redirectWithButtonClicked.toString()}">yes, i am ${
-          aggieToken.anumber
-        }. click me.</a></body>`;
+        return `<body>
+        <form action="/authaggie" method="GET">
+          <input type="hidden" value="${query.aggieToken}" name="aggieToken" />
+          <input type="hidden" value="${
+            query.wantsRedirect ?? "true"
+          }" name="wantsRedirect" />
+          <input type="checkbox" value="true" name="buttonClicked" required />
+          <button type="submit">yes, i am ${
+            aggieToken.anumber
+          }. click me.</button>
+        </form>
+        </body>`;
       },
       {
         query: t.Object({
           aggieToken: t.String(),
           wantsRedirect: t.Optional(
-            t.RegExp(/^(true|false)$/, { default: "true" }),
+            t.RegExp(/^(true|false)$/, { default: "true" })
           ),
           buttonClicked: t.Optional(
-            t.RegExp(/^(true|false)$/, { default: "false" }),
+            t.RegExp(/^(true|false)$/, { default: "false" })
           ),
         }),
         type: "text/html",
-      },
+      }
     );
 
     this.delete(
@@ -103,7 +112,7 @@ export class AggieAuthService extends Elysia {
         if (aggieToken.api_token != apiToken.token) {
           set.status = 403;
           throw new Error(
-            "cannot delete aggieauth token unrelated to your api key!",
+            "cannot delete aggieauth token unrelated to your api key!"
           );
         }
 
@@ -113,7 +122,7 @@ export class AggieAuthService extends Elysia {
       {
         params: t.Object({ token: t.String() }),
         beforeHandle: async (before) => await this.ensureApiToken(before),
-      },
+      }
     );
 
     this.post(
@@ -147,7 +156,7 @@ export class AggieAuthService extends Elysia {
           }),
           t.Object({ error: t.String() }),
         ]),
-      },
+      }
     );
 
     this.get(
@@ -160,7 +169,7 @@ export class AggieAuthService extends Elysia {
       },
       {
         beforeHandle: async (before) => await this.ensureApiToken(before),
-      },
+      }
     );
 
     this.post(
@@ -173,7 +182,7 @@ export class AggieAuthService extends Elysia {
           anumber: t.RegExp(AggieAuthService.A_NUMBER_REGEX, { default: "" }),
         }),
         response: t.Any([t.Boolean(), t.Object({ error: t.String() })]),
-      },
+      }
     );
 
     // callback after sending token confirmation to dev account
@@ -196,7 +205,7 @@ export class AggieAuthService extends Elysia {
           apiToken: t.String(),
         }),
         response: t.String(),
-      },
+      }
     );
 
     this.put(
@@ -225,7 +234,7 @@ export class AggieAuthService extends Elysia {
           }),
         }),
         beforeHandle: async (before) => await this.ensureApiToken(before),
-      },
+      }
     );
 
     this.delete(
@@ -240,7 +249,7 @@ export class AggieAuthService extends Elysia {
       {
         response: t.Boolean(),
         beforeHandle: async (before) => await this.ensureApiToken(before),
-      },
+      }
     );
 
     this.listen(port);
@@ -256,8 +265,9 @@ export class AggieAuthService extends Elysia {
 
     if (!tokenExists) {
       set.status = 401;
-      set.headers["WWW-Authenticate"] =
-        `Bearer realm='sign', error="invalid_request"`;
+      set.headers[
+        "WWW-Authenticate"
+      ] = `Bearer realm='sign', error="invalid_request"`;
       return "Unauthorized";
     }
   }
@@ -291,7 +301,7 @@ export class AggieAuthService extends Elysia {
     const sent = await this.aggieMailer.sendMail(
       anumber,
       `🐧 ${anumber} - Auth Request`,
-      this.makeTemplate(anumber, apiToken.description, verificationLink),
+      this.makeTemplate(anumber, apiToken.description, verificationLink)
     );
     if (sent)
       return { token: aggieToken.token, expire_at: aggieToken.expire_at };
@@ -301,7 +311,7 @@ export class AggieAuthService extends Elysia {
   private makeTemplate(
     anumber: string,
     description: string,
-    verificationLink: string,
+    verificationLink: string
   ) {
     return (
       "<h1>Hello from the FSLC 👋!</h1>\n" +
