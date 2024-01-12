@@ -64,6 +64,7 @@ export class AggieAuthService extends Elysia {
             redirect: ((query.wantsRedirect ?? "true") === "true").toString(),
           });
           set.redirect = apiToken.callback + `?${callbackParams.toString()}`;
+          return;
         }
 
         const redirectWithButtonClicked = new URLSearchParams({
